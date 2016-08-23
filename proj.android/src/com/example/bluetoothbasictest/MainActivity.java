@@ -1,7 +1,7 @@
 package com.example.bluetoothbasictest;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,11 +18,12 @@ public class MainActivity extends Activity implements OnClickListener {
 	
 	private BluetoothService _btService = null;
 	
+	@SuppressLint("HandlerLeak")
 	private final Handler _handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
-			
+			Log.i(TAG, "MainActivity::handleMessage msg:"+msg);
 		}
 	};
 	
