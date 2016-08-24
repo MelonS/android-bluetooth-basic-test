@@ -9,6 +9,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Build;
@@ -140,6 +141,12 @@ public class BluetoothService {
 
 	}
 
+	public void acceptStart() {
+		Log.i(TAG, "acceptStart");
+		
+		AcceptThread t = new AcceptThread();
+		t.start();
+	}
 
 
 	private class ConnectedThread extends Thread
@@ -250,6 +257,48 @@ public class BluetoothService {
 		}
 	}
 
+	private class AcceptThread extends Thread {
+		
+		private final BluetoothServerSocket _serverSocket;
+		
+		public AcceptThread() {
+			BluetoothServerSocket tmp = null;
+			
+			try {
+				tmp = _btAdapter.listenUsingRfcommWithServiceRecord("testapp", UUID_SPP);
+			} catch (IOException e) {
+				Log.i(TAG, "AcceptThread Create Failed");
+			}
+			
+			_serverSocket = tmp;
+		}
+
+		@Override
+		public void run() {
+			super.run();
+			
+			Log.i(TAG, "AcceptThread::run()");
+			
+			if (!_isConnected) {
+				while (!_isConnected) {
+					BluetoothSocket socket = null;
+					
+					try {
+						Log.i(TAG, "AcceptThread READY!!");
+						socket = _serverSocket.accept();
+						_isConnected = true;
+						Log.i(TAG, "Is Accepted!!!");
+						
+					} catch (IOException e) {
+						e.printStackTrace();
+						break;
+					}
+				}
+			}else{
+				Log.i(TAG, "AcceptThread run Failed IsConnected!!!");
+			}
+		}
+	}
 
 	/*
 	 * private methods
